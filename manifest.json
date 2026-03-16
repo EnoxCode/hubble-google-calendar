@@ -1,0 +1,60 @@
+{
+  "name": "gmail-calendar",
+  "version": "1.0.0",
+  "description": "Google Calendar integration displaying upcoming events",
+  "minAppVersion": "0.1.0",
+  "type": ["connector", "visualization"],
+  "oauth": {
+    "provider": "google",
+    "scopes": ["https://www.googleapis.com/auth/calendar.readonly"]
+  },
+  "visualizations": [
+    {
+      "name": "Calendar",
+      "description": "7-day calendar with five layout variants",
+      "path": "calendar",
+      "properties": [
+        { "name": "title", "type": "string", "required": true, "description": "Widget title shown in the editor" },
+        {
+          "name": "layout",
+          "type": "choice",
+          "required": false,
+          "default": "xl",
+          "choices": [
+            { "label": "XL — 7-day full", "value": "xl" },
+            { "label": "L — 7-day compact", "value": "l" },
+            { "label": "M — 3-day", "value": "m" },
+            { "label": "S — Today only", "value": "s" },
+            { "label": "Vertical — 7-day rows", "value": "vertical" }
+          ],
+          "description": "Layout variant"
+        }
+      ],
+      "mockData": {
+        "events": [
+          { "id": "1", "title": "Football", "start": "2026-03-08T10:00:00", "end": "2026-03-08T12:00:00", "allDay": false, "location": null, "color": null },
+          { "id": "2", "title": "Standup", "start": "2026-03-10T09:30:00", "end": "2026-03-10T09:45:00", "allDay": false, "location": null, "color": "#4285F4" },
+          { "id": "3", "title": "Dentist", "start": "2026-03-10T14:00:00", "end": "2026-03-10T15:00:00", "allDay": false, "location": "Tandarts Centrum", "color": null },
+          { "id": "4", "title": "⚑ Tax deadline", "start": "2026-03-14T00:00:00", "end": "2026-03-14T23:59:59", "allDay": true, "location": null, "color": "#DC2626", "isCritical": true },
+          { "id": "5", "title": "Design review", "start": "2026-03-14T11:00:00", "end": "2026-03-14T12:00:00", "allDay": false, "location": "Google Meet", "color": "#4285F4" },
+          { "id": "6", "title": "Lunch — Sam", "start": "2026-03-14T13:00:00", "end": "2026-03-14T14:00:00", "allDay": false, "location": "Café de Koffiebar", "color": null },
+          { "id": "7", "title": "Birthday 🎂", "start": "2026-03-15T00:00:00", "end": "2026-03-15T23:59:59", "allDay": true, "location": null, "color": "#34A853" },
+          { "id": "8", "title": "Dinner out", "start": "2026-03-15T19:30:00", "end": "2026-03-15T22:00:00", "allDay": false, "location": "Restaurant Julius", "color": null },
+          { "id": "9", "title": "Groceries", "start": "2026-03-16T10:00:00", "end": "2026-03-16T11:00:00", "allDay": false, "location": null, "color": null },
+          { "id": "10", "title": "Sprint demo", "start": "2026-03-17T10:00:00", "end": "2026-03-17T11:00:00", "allDay": false, "location": null, "color": "#F4B400" },
+          { "id": "11", "title": "Standup", "start": "2026-03-17T09:00:00", "end": "2026-03-17T09:15:00", "allDay": false, "location": null, "color": "#4285F4" },
+          { "id": "12", "title": "1:1 with Manager", "start": "2026-03-17T14:00:00", "end": "2026-03-17T14:30:00", "allDay": false, "location": null, "color": null },
+          { "id": "13", "title": "Code review", "start": "2026-03-17T16:00:00", "end": "2026-03-17T16:30:00", "allDay": false, "location": null, "color": null }
+        ],
+        "lastUpdated": "2026-03-14T12:58:00"
+      }
+    }
+  ],
+  "properties": [
+    { "name": "clientId", "type": "secret", "required": true, "scope": "connector", "description": "Google OAuth Client ID" },
+    { "name": "clientSecret", "type": "secret", "required": true, "scope": "connector", "description": "Google OAuth Client Secret" },
+    { "name": "calendarId", "type": "string", "required": false, "default": "primary", "scope": "connector", "description": "Calendar ID" },
+    { "name": "refreshInterval", "type": "range", "required": false, "default": 300, "min": 60, "max": 3600, "step": 60, "scope": "connector", "description": "Refresh interval (seconds)" },
+    { "name": "daysAhead", "type": "number", "required": false, "default": 7, "min": 1, "max": 30, "scope": "connector", "description": "Days ahead to fetch" }
+  ]
+}
