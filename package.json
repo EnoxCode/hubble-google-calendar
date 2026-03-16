@@ -1,6 +1,6 @@
 {
   "name": "hubble-module-gmail-calendar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Google Calendar integration displaying upcoming events",
   "private": true,
   "keywords": [
