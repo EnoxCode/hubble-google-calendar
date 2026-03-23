@@ -19,13 +19,17 @@ import { CalendarVertical } from './CalendarVertical';
 
 function makeDaySlots(overrides?: Partial<DaySlot>[]): DaySlot[] {
   const base: DaySlot[] = [
-    { date: new Date('2026-03-11'), dayName: 'Wed', dayNum: 11, status: 'past', events: [] },
-    { date: new Date('2026-03-12'), dayName: 'Thu', dayNum: 12, status: 'past', events: [] },
-    { date: new Date('2026-03-13'), dayName: 'Fri', dayNum: 13, status: 'past', events: [] },
-    { date: new Date('2026-03-14'), dayName: 'Sat', dayNum: 14, status: 'today', events: [] },
+    { date: new Date('2026-03-11'), dayName: 'Wed', dayNum: 11, status: 'past',   events: [] },
+    { date: new Date('2026-03-12'), dayName: 'Thu', dayNum: 12, status: 'past',   events: [] },
+    { date: new Date('2026-03-13'), dayName: 'Fri', dayNum: 13, status: 'past',   events: [] },
+    { date: new Date('2026-03-14'), dayName: 'Sat', dayNum: 14, status: 'today',  events: [] },
     { date: new Date('2026-03-15'), dayName: 'Sun', dayNum: 15, status: 'future', events: [] },
     { date: new Date('2026-03-16'), dayName: 'Mon', dayNum: 16, status: 'future', events: [] },
     { date: new Date('2026-03-17'), dayName: 'Tue', dayNum: 17, status: 'future', events: [] },
+    { date: new Date('2026-03-18'), dayName: 'Wed', dayNum: 18, status: 'future', events: [] },
+    { date: new Date('2026-03-19'), dayName: 'Thu', dayNum: 19, status: 'future', events: [] },
+    { date: new Date('2026-03-20'), dayName: 'Fri', dayNum: 20, status: 'future', events: [] },
+    { date: new Date('2026-03-21'), dayName: 'Sat', dayNum: 21, status: 'future', events: [] },
   ];
   if (overrides) {
     overrides.forEach((o, i) => { if (o) Object.assign(base[i], o); });
@@ -161,8 +165,8 @@ describe('CalendarVertical', () => {
   it('renders vertical container with only today + future rows (no past)', () => {
     const { container } = render(<CalendarVertical days={makeDaySlots()} now={now} />);
     expect(container.querySelector('.cal-vertical')).not.toBeNull();
-    // 7 slots - 3 past = 4 rows (today + 3 future)
-    expect(container.querySelectorAll('.cal-vrow')).toHaveLength(4);
+    // 11 slots - 3 past = 8 rows (today + 7 future)
+    expect(container.querySelectorAll('.cal-vrow')).toHaveLength(8);
   });
 
   it('does not render past rows', () => {
@@ -177,7 +181,7 @@ describe('CalendarVertical', () => {
 
   it('renders spine divider in each row', () => {
     const { container } = render(<CalendarVertical days={makeDaySlots()} now={now} />);
-    expect(container.querySelectorAll('.cal-vrow-spine')).toHaveLength(4);
+    expect(container.querySelectorAll('.cal-vrow-spine')).toHaveLength(8);
   });
 
   it('renders future events as pills with cal-pill-vertical class', () => {
