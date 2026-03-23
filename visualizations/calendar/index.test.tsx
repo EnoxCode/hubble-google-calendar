@@ -255,6 +255,14 @@ describe('Calendar (main component)', () => {
     expect(container.querySelector('.cal-tg')).not.toBeNull();
   });
 
+  it('adds cal-xl-full class to DashWidget for xl layout', () => {
+    mockData = { events: [], lastUpdated: '2026-03-14T12:00:00' };
+    mockConfig = {};
+    const { container } = render(<Calendar />);
+    // DashWidget mock renders as [data-testid="DashWidget"] with className forwarded
+    expect(container.querySelector('[data-testid="DashWidget"].cal-xl-full')).not.toBeNull();
+  });
+
   it('renders S layout when config.layout is "s"', () => {
     mockData = { events: [], lastUpdated: '2026-03-14T12:00:00' };
     mockConfig = { layout: 's' };

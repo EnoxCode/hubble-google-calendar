@@ -64,7 +64,7 @@ export default function Calendar() {
   const updatedAt = data.lastUpdated ? new Date(data.lastUpdated) : undefined;
 
   return (
-    <DashWidget>
+    <DashWidget className={layout === 'xl' ? 'cal-xl-full' : undefined}>
       <DashWidgetHeader label={headerLabel} meta={meta} />
       <LayoutComponent days={days} now={now} />
       <DashWidgetFooter updatedAt={updatedAt} status="ok" />
