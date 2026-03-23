@@ -59,9 +59,9 @@ describe('CalendarXL', () => {
     expect(container.querySelectorAll('.cal-tg-header-cell')).toHaveLength(7);
   });
 
-  it('renders time label slots for each hour (7 AM to 10 PM = 15 labels)', () => {
+  it('renders time label slots for each hour (8 AM to 10 PM = 14 labels)', () => {
     const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
-    expect(container.querySelectorAll('.cal-tg-slot')).toHaveLength(15);
+    expect(container.querySelectorAll('.cal-tg-slot')).toHaveLength(14);
   });
 
   it('renders a timed event as .cal-tg-event in the correct day column', () => {

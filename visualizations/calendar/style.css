@@ -279,7 +279,7 @@
 }
 
 .cal-tg-slot {
-  height: 48px;
+  height: 40px;
   flex-shrink: 0;
   display: flex;
   align-items: flex-start;

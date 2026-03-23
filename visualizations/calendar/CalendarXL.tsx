@@ -8,10 +8,10 @@ import {
   formatTime,
 } from './utils';
 
-const START_HOUR = 7;
+const START_HOUR = 8;
 const END_HOUR   = 22;
-const PX_PER_HOUR = 48;
-const TOTAL_HEIGHT = (END_HOUR - START_HOUR) * PX_PER_HOUR; // 720px
+const PX_PER_HOUR = 40;
+const TOTAL_HEIGHT = (END_HOUR - START_HOUR) * PX_PER_HOUR; // 560px
 
 const HOUR_LABELS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => {
   const h = START_HOUR + i;
@@ -116,7 +116,14 @@ export function CalendarXL({ days, now }: CalendarLayoutProps) {
                   <div
                     key={ev.id}
                     className="cal-tg-event"
-                    style={{ top: pos.top, height: pos.height }}
+                    style={{
+                      top: pos.top,
+                      height: pos.height,
+                      ...(getPillColor(ev) && {
+                        background:  getPillColor(ev) + '33',
+                        borderColor: getPillColor(ev) + '66',
+                      }),
+                    }}
                   >
                     <div className="cal-tg-event-title">{ev.title}</div>
                     <div className="cal-tg-event-time">{formatTime(ev.start, false)}</div>
