@@ -40,44 +40,78 @@ function makeDaySlots(overrides?: Partial<DaySlot>[]): DaySlot[] {
 const now = new Date('2026-03-14T12:00:00');
 
 describe('CalendarXL', () => {
-  it('renders 7 day columns with day names and numbers', () => {
+  it('renders the time-grid body container', () => {
     const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
-    expect(container.querySelectorAll('.cal-day')).toHaveLength(7);
-    expect(screen.getByText('Wed')).toBeInTheDocument();
-    expect(screen.getByText('14')).toBeInTheDocument();
+    expect(container.querySelector('.cal-tg-body')).not.toBeNull();
   });
 
-  it('applies cal-day--today to today column', () => {
+  it('renders exactly 7 day columns starting from today (no past days)', () => {
     const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
-    const todayCol = container.querySelectorAll('.cal-day')[3];
-    expect(todayCol).toHaveClass('cal-day--today');
+    expect(container.querySelectorAll('.cal-tg-col')).toHaveLength(7);
+    // First column header should be today's day name (Sat) and number (14)
+    const headers = container.querySelectorAll('.cal-tg-header-cell');
+    expect(headers[0]).toHaveClass('cal-tg-header-cell--today');
+    expect(headers[0].textContent).toContain('14');
   });
 
-  it('applies cal-day--past to past columns', () => {
+  it('renders 7 day header cells', () => {
     const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
-    const pastCol = container.querySelectorAll('.cal-day')[0];
-    expect(pastCol).toHaveClass('cal-day--past');
+    expect(container.querySelectorAll('.cal-tg-header-cell')).toHaveLength(7);
   });
 
-  it('renders event pills with title and time', () => {
+  it('renders time label slots for each hour (7 AM to 10 PM = 15 labels)', () => {
+    const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
+    expect(container.querySelectorAll('.cal-tg-slot')).toHaveLength(15);
+  });
+
+  it('renders a timed event as .cal-tg-event in the correct day column', () => {
     const event: CalendarEvent = {
-      id: '1', title: 'Standup', start: '2026-03-14T09:00:00', end: '2026-03-14T09:15:00',
-      allDay: false, location: null, color: '#4285F4',
+      id: '1', title: 'Standup', start: '2026-03-14T09:00:00', end: '2026-03-14T10:00:00',
+      allDay: false, location: null,
+    };
+    // today is index 3 in makeDaySlots; CalendarXL slices from there
+    const days = makeDaySlots([undefined, undefined, undefined, { events: [event] }]);
+    const { container } = render(<CalendarXL days={days} now={now} />);
+    expect(container.querySelector('.cal-tg-event')).not.toBeNull();
+    expect(screen.getByText('Standup')).toBeInTheDocument();
+  });
+
+  it('renders an all-day event as a pill in the all-day strip, not the time grid', () => {
+    const event: CalendarEvent = {
+      id: '1', title: 'Team Offsite', start: '2026-03-14', end: '2026-03-15',
+      allDay: true, location: null,
     };
     const days = makeDaySlots([undefined, undefined, undefined, { events: [event] }]);
-    render(<CalendarXL days={days} now={now} />);
-    expect(screen.getByText('Standup')).toBeInTheDocument();
-    expect(screen.getByText('09:00')).toBeInTheDocument();
+    const { container } = render(<CalendarXL days={days} now={now} />);
+    // All-day pill lives inside the allday strip
+    const strip = container.querySelector('.cal-tg-allday-row');
+    expect(strip).not.toBeNull();
+    expect(strip!.textContent).toContain('Team Offsite');
+    // Must NOT appear as a .cal-tg-event in the time grid
+    expect(container.querySelector('.cal-tg-event')).toBeNull();
   });
 
-  it('shows +N overflow when more than 3 events', () => {
-    const events: CalendarEvent[] = Array.from({ length: 5 }, (_, i) => ({
-      id: String(i), title: `Event ${i}`, start: '2026-03-14T10:00:00', end: '2026-03-14T11:00:00',
+  it("renders the now indicator in today's column when within time range", () => {
+    // now = 12:00 which is within 7 AM–10 PM
+    const { container } = render(<CalendarXL days={makeDaySlots()} now={now} />);
+    const todayCol = container.querySelectorAll('.cal-tg-col')[0]; // today is first column
+    expect(todayCol.querySelector('.cal-tg-now-line')).not.toBeNull();
+  });
+
+  it('does not render the now indicator when now is outside the time range', () => {
+    const earlyNow = new Date('2026-03-14T05:00:00'); // before 7 AM
+    const { container } = render(<CalendarXL days={makeDaySlots()} now={earlyNow} />);
+    expect(container.querySelector('.cal-tg-now-line')).toBeNull();
+  });
+
+  it('does not render a timed event that ends before START_HOUR (7 AM)', () => {
+    const earlyEvent: CalendarEvent = {
+      id: '1', title: 'Early Call', start: '2026-03-14T05:00:00', end: '2026-03-14T06:30:00',
       allDay: false, location: null,
-    }));
-    const days = makeDaySlots([undefined, undefined, undefined, { events }]);
-    render(<CalendarXL days={days} now={now} />);
-    expect(screen.getByText('+2 more')).toBeInTheDocument();
+    };
+    const days = makeDaySlots([undefined, undefined, undefined, { events: [earlyEvent] }]);
+    const { container } = render(<CalendarXL days={days} now={now} />);
+    expect(container.querySelector('.cal-tg-event')).toBeNull();
   });
 });
 
@@ -218,10 +252,7 @@ describe('Calendar (main component)', () => {
     mockData = { events: [], lastUpdated: '2026-03-14T12:00:00' };
     mockConfig = {};
     const { container } = render(<Calendar />);
-    const grid = container.querySelector('.cal-grid');
-    expect(grid).not.toBeNull();
-    expect(grid).not.toHaveClass('cal-grid--compact');
-    expect(grid).not.toHaveClass('cal-grid--3col');
+    expect(container.querySelector('.cal-tg')).not.toBeNull();
   });
 
   it('renders S layout when config.layout is "s"', () => {
