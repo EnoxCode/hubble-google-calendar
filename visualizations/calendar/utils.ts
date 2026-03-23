@@ -153,6 +153,31 @@ export function getStateColor(state: DashPillState): string {
   return map[state];
 }
 
+export interface EventPosition {
+  top: number;    // px from top of time grid
+  height: number; // px, minimum 20px
+}
+
+export function getEventPosition(
+  event: CalendarEvent,
+  startHour: number,
+  endHour: number,
+  pxPerHour: number,
+): EventPosition {
+  const rangeMinutes = (endHour - startHour) * 60;
+  const s = new Date(event.start);
+  const e = new Date(event.end);
+
+  const startMinutes = Math.max(0, s.getHours() * 60 + s.getMinutes() - startHour * 60);
+  const endMinutes   = Math.min(rangeMinutes, e.getHours() * 60 + e.getMinutes() - startHour * 60);
+  const duration     = Math.max(endMinutes - startMinutes, 0);
+
+  return {
+    top:    (startMinutes / 60) * pxPerHour,
+    height: Math.max((duration / 60) * pxPerHour, 20),
+  };
+}
+
 function toDateKey(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   getDaySlots,
+  getEventPosition,
   getPillVariant,
   getPillState,
   getVisibleEvents,
@@ -211,5 +212,53 @@ describe('getGoogleColorState', () => {
 
   it('returns neutral for unknown colors', () => {
     expect(getGoogleColorState('#FF00FF')).toBe('neutral');
+  });
+});
+
+describe('getEventPosition', () => {
+  const START = 7;
+  const END   = 22;
+  const PPH   = 48; // px per hour
+
+  const mkEvent = (start: string, end: string): CalendarEvent => ({
+    id: '1', title: 'T', start, end, allDay: false, location: null,
+  });
+
+  it('positions an event at the correct top offset', () => {
+    // 9:00 AM = 2 hours after 7 AM = 96px
+    const ev = mkEvent('2026-03-14T09:00:00', '2026-03-14T10:00:00');
+    const pos = getEventPosition(ev, START, END, PPH);
+    expect(pos.top).toBe(96);
+  });
+
+  it('calculates height from duration', () => {
+    // 1 hour = 48px
+    const ev = mkEvent('2026-03-14T09:00:00', '2026-03-14T10:00:00');
+    expect(getEventPosition(ev, START, END, PPH).height).toBe(48);
+  });
+
+  it('enforces minimum height of 20px for short events', () => {
+    // 15-minute event = 12px, clamped to 20px
+    const ev = mkEvent('2026-03-14T09:00:00', '2026-03-14T09:15:00');
+    expect(getEventPosition(ev, START, END, PPH).height).toBe(20);
+  });
+
+  it('clamps events that start before startHour to top: 0', () => {
+    const ev = mkEvent('2026-03-14T06:00:00', '2026-03-14T08:00:00');
+    expect(getEventPosition(ev, START, END, PPH).top).toBe(0);
+  });
+
+  it('clamps events that end after endHour', () => {
+    // Start at 21:00 (14 hours * 48 = 672px), end clamped at 22:00 (720px)
+    const ev = mkEvent('2026-03-14T21:00:00', '2026-03-14T23:00:00');
+    const pos = getEventPosition(ev, START, END, PPH);
+    expect(pos.top).toBe(672);
+    expect(pos.height).toBe(48); // 1 hour from 21:00 to clamped 22:00
+  });
+
+  it('handles half-hour start times', () => {
+    // 9:30 AM = 2.5 hours * 48 = 120px
+    const ev = mkEvent('2026-03-14T09:30:00', '2026-03-14T10:00:00');
+    expect(getEventPosition(ev, START, END, PPH).top).toBe(120);
   });
 });
