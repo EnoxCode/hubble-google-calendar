@@ -1,6 +1,6 @@
 {
   "name": "gmail-calendar",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Google Calendar integration displaying upcoming events",
   "minAppVersion": "0.1.0",
   "type": [
